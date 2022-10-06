@@ -26,8 +26,34 @@ void showRes()
 {
     for (result& result : res)
     {
-        cout << result.m_comb << "\n";
+        cout << result.m_comb << " " << result.m_count << "\n";
     }
+}
+
+void find_largest(vector<string>& answer)
+{
+    //시킨 손님 수
+    int temp_count = 0;
+
+    for (result& result : res)
+    {
+        if (temp_count < result.m_count)
+            temp_count = result.m_count;
+    }
+
+    for (result& result : res)
+    {
+        //두명 이상 시킨 경우에, 최댓값이 같은 경우도 포함
+        if (temp_count == result.m_count && temp_count > 1)
+        {
+            answer.push_back(result.m_comb);
+            cout << "\n" << result.m_comb << "\n";
+        }
+    }
+
+    cout << "\n";
+
+    res.clear();
 }
 
 //order 내에서 num개의 원소를 갖는 조합을 구한다
@@ -36,6 +62,11 @@ void find_Combination(string order, int num)
     //조합을 위해 permutation(순열) 쓸건데, 이에 이용 (원소가 1인 인덱스만 읽으면 그게 조합이다)
     vector<int> temp;
     vector<string> combs;
+
+    sort(order.begin(), order.end());
+
+    if (order.size() < num)
+        return;
 
     for (int i = 0; i < order.size(); i++)
     {
@@ -86,7 +117,7 @@ void find_Combination(string order, int num)
 
 			for (result& result : res)
 			{
-                if (str.compare(result.m_comb))
+                if (!str.compare(result.m_comb))
                 {
                     found = true;
                     result.m_count++;
@@ -104,33 +135,42 @@ void find_Combination(string order, int num)
             res.push_back(result(str, 1));
     }
 
-    showRes();
+    //showRes();
 }
 
 vector<string> solution(vector<string> orders, vector<int> course)
 {
     // A~Z
-    vector<string> found;
-    int count;
+    vector<string> answer;
 
-    //orders 를 돌며 course 안에 들어있는 수를 베이스로 경우의 수를 모두 찾는다. 
-    for (string& str : orders)
+    //course 를 돌며 order 안에 들어있는 주문을 베이스로 경우의 수를 모두 찾는다. 
+	for (int& num : course)
+	{
+		for (string& str : orders)
+		{
+			find_Combination(str, num);
+		}
+
+        showRes();
+        find_largest(answer);
+	}
+
+    sort(answer.begin(), answer.end());
+    for (string& str : answer)
     {
-        for (int& num : course)
-        {
-
-        }
+        cout << "[" << str << "] ";
     }
 
-    vector<string> answer;
     return answer;
 }
 
 int main()
 {
-    vector<string> orders = { "ABCFG", "AC", "CDE", "ACDE", "BCFG", "ACDEH" };
+    vector<string> orders = { "XYZ", "XWY", "WXA" };
     vector<int> course = {2, 3, 4};
 
-    //solution(orders, course);
-    find_Combination("ABCFG", 2);
+    solution(orders, course);
+    //find_Combination("ABCFG", 3);
+
+    showRes();
 }
